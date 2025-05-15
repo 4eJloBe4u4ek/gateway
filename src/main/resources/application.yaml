@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedHeaders: "*"
+            allowedMethods: "GET,POST,PUT,DELETE,OPTIONS"
+            allowCredentials: true
+      routes:
+        - id: oauth2
+          uri: ${services.auth}
+          predicates:
+            - Path=/oauth2/authorization/google,/login/oauth2/code/**
+        - id: auth
+          uri: ${services.auth}
+          predicates:
+            - Path=/auth/**
+        - id: comment
+          uri: ${services.comment}
+          predicates:
+            - Path=/news/*/comments/**
+        - id: news
+          uri: ${services.news}
+          predicates:
+            - Path=/news/**
+
+server:
+  port: 8080
+
+services:
+  auth: http://localhost:8081
+  news: http://localhost:8083
+  comment: http://localhost:8084
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.cloud.gateway: DEBUG
